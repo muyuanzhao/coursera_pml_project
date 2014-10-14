@@ -1,0 +1,51 @@
+# Practical Machine Learning - Exercise Classification Project
+
+
+## Description
+In this project we use the Weight Lifting Exercise dataset from http://groupware.les.inf.puc-rio.br/har.  The participants represented in these data were asked to perform barbell lifts correctly and incorrectly in 5 different ways.  The goal of the this project is to be able to classify future barbell lift observations as 1 of these 5 different ways algorithmically.
+
+## Data Preperation
+
+Once the data is downloaded onto a local machine, we load it into R as a data frame.  Certain text strings should be imported as nulls, and we specify this with the na.strings parameter.  
+```{r}
+file <- read.csv("~/Downloads/pml-training.csv", header=T, na.strings = c("NA", "", "#DIV/0!"))
+```
+
+There are columns in this dataset that contain many nulls.  We will not use these or the first 7 columns, as they do not contain information relevant to this analysis.  Once the columns for the analysis have been identified, we create our training and test datasets.  
+```{r}
+library(lattice)
+library(ggplot2)
+library(caret)
+
+na_sums <- apply(file, 2, function(x){sum(is.na(x))>0})
+cols_to_keep <- names(na_sums[na_sums==F])
+cols_to_keep <- cols_to_keep[-c(1:7)]
+
+inTrain <- createDataPartition(y=file$classe, p=.6, list=FALSE)
+training <- file[inTrain, cols_to_keep]
+testing <- file[-inTrain, cols_to_keep]
+```
+
+After prepping the data, only 53 columns (52 input variables) remain.  
+```{r}
+length(names(training))
+```
+
+## Classification Algorithm
+
+The Random Forest algorithm was chosen to create the model for this problem.  Cross validation is taken care of with the Random Forest algorithm because each tree in the ensemble is created from a bootstrapped sample of the training data, as well as a random subset of the possible features. 
+```{r cache=T, results='hide'}
+modFit <- train(classe ~ ., method="rf", data=training)
+```
+
+## Out of Sample Error Rate
+
+Now that our Random Forest model has been created, we can estimate the out of sample error rate by comparing the model predictions to the actual classfications of the test dataset.  
+
+```{r, results='hide'}
+num_correctly_classified <- sum(predict(modFit, testing) == testing$classe)
+```
+```{r}
+oos_error <- 1 - num_correctly_classified/length(testing$classe)
+oos_error
+```
