@@ -66,6 +66,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <pre class="r"><code>library(lattice)
 library(ggplot2)
 library(caret)
+set.seed(1234)
 
 na_sums &lt;- apply(file, 2, function(x){sum(is.na(x))&gt;0})
 cols_to_keep &lt;- names(na_sums[na_sums==F])
@@ -92,7 +93,8 @@ testing &lt;- file[-inTrain, cols_to_keep]</code></pre>
 ## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 <pre class="r"><code>oos_error &lt;- 1 - num_correctly_classified/length(testing$classe)
 oos_error</code></pre>
-<pre><code>## [1] 0.002294</code></pre>
+<pre><code>## [1] 0.002677</code></pre>
+<pre class="r"><code>## [1] 0.002677</code></pre>
 </div>
 </div>
 
