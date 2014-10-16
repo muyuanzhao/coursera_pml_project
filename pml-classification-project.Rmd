@@ -45,6 +45,7 @@ Now that our Random Forest model has been created, we can estimate the out of sa
 ```{r, results='hide'}
 num_correctly_classified <- sum(predict(modFit, testing) == testing$classe)
 ```
+
 ```{r}
 oos_error <- 1 - num_correctly_classified/length(testing$classe)
 oos_error
